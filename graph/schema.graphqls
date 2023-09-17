@@ -1,0 +1,49 @@
+type User {
+  id: ID!
+  name: String!
+  surname: String!
+  patronymic: String
+  age: Int!
+  gender: String!
+  country: String!
+}
+
+input Filter {
+  limit: Int!
+  offset: Int!
+  order: String
+  minAge: Int
+  maxAge: Int
+}
+
+type Query {
+  getEnrichedFIO(filter: Filter!): [User!]!
+}
+
+input Fio {
+  name: String!
+  surname: String!
+  patronymic: String
+}
+
+type FailedFio {
+  name: String!
+  surname: String!
+  patronymic: String
+}
+
+input EnrichedFio {
+  id: ID!
+  name: String
+  surname: String
+  patronymic: String
+  age: Int
+  gender: String
+  country: String
+}
+
+type Mutation {
+  createFIO(fios: [Fio!]!): [FailedFio!]!
+  updateEnrichedFIO(enrichedFIO: EnrichedFio!): User
+  deleteEnrichedFIO(id: Int!): User
+}
