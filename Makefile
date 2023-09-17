@@ -1,15 +1,15 @@
 include configs/.env
 
 dep:
-	@go mod download
+	@go mod tidy
 
 init:
 	@docker-compose up -d
 
-run:
+run: dep
 	@go run cmd/main.go
 
-test:
+test: dep
 	@go test ./...
 
 help:
