@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
+	"github.com/wtkeqrf0/restService/internal/postgres"
 	"github.com/wtkeqrf0/restService/pkg/ent"
-	"github.com/wtkeqrf0/restService/postgres"
 )
 
 type UpdateEnrichedFIORequest struct {

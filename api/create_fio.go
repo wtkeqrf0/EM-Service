@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
-	"github.com/wtkeqrf0/restService/kafka"
+	"github.com/wtkeqrf0/restService/internal/kafka"
 	"sync"
 )
 

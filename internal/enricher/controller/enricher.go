@@ -5,7 +5,7 @@ package controller
 import (
 	"context"
 
-	"github.com/wtkeqrf0/restService/enricher"
+	"github.com/wtkeqrf0/restService/internal/enricher"
 )
 
 // Controller describes methods, implemented by the enricher package.
@@ -17,7 +17,7 @@ type Enricher interface {
 	//
 	// If FIO is incorrect, all new fields will have zero values.
 	EnrichFIO(ctx context.Context, fio enricher.FIO) (resp enricher.EnrichedFIO, err error)
-	// ValidateName on exist. Accepts context and name
-	// and returns error, if name doesn't exist.
+	// ValidateName on exist. Accepts name
+	// and returns true, if name can be enriched.
 	ValidateName(name string) bool
 }

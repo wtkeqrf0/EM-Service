@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	kfk "github.com/segmentio/kafka-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/wtkeqrf0/restService/enricher"
-	ce "github.com/wtkeqrf0/restService/enricher/controller"
-	"github.com/wtkeqrf0/restService/postgres"
-	cp "github.com/wtkeqrf0/restService/postgres/controller"
+	"github.com/wtkeqrf0/restService/internal/enricher"
+	ce "github.com/wtkeqrf0/restService/internal/enricher/controller"
+	"github.com/wtkeqrf0/restService/internal/postgres"
+	cp "github.com/wtkeqrf0/restService/internal/postgres/controller"
 )
 
 // Kafka struct provides the ability to interact with the Apache Kafka service.

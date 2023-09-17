@@ -5,9 +5,9 @@ package controller
 import (
 	"context"
 
-	ce "github.com/wtkeqrf0/restService/enricher/controller"
-	"github.com/wtkeqrf0/restService/kafka"
-	cp "github.com/wtkeqrf0/restService/postgres/controller"
+	ce "github.com/wtkeqrf0/restService/internal/enricher/controller"
+	"github.com/wtkeqrf0/restService/internal/kafka"
+	cp "github.com/wtkeqrf0/restService/internal/postgres/controller"
 )
 
 // Controller describes methods, implemented by the kafka package.

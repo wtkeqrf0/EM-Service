@@ -8,9 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	controller "github.com/wtkeqrf0/restService/enricher/controller"
-	kafka "github.com/wtkeqrf0/restService/kafka"
-	controller0 "github.com/wtkeqrf0/restService/postgres/controller"
+	controller "github.com/wtkeqrf0/restService/internal/enricher/controller"
+	kafka "github.com/wtkeqrf0/restService/internal/kafka"
+	controller0 "github.com/wtkeqrf0/restService/internal/postgres/controller"
 	gomock "go.uber.org/mock/gomock"
 )
 

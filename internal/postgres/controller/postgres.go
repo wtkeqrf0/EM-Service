@@ -6,8 +6,8 @@ import (
 	"context"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/wtkeqrf0/restService/internal/postgres"
 	"github.com/wtkeqrf0/restService/pkg/ent"
-	"github.com/wtkeqrf0/restService/postgres"
 )
 
 // Controller describes methods, implemented by the postgres package.

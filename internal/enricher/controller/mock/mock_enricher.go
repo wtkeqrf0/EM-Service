@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	enricher "github.com/wtkeqrf0/restService/enricher"
+	enricher "github.com/wtkeqrf0/restService/internal/enricher"
 	gomock "go.uber.org/mock/gomock"
 )
 

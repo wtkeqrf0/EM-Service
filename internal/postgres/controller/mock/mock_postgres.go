@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	postgres "github.com/wtkeqrf0/restService/internal/postgres"
 	ent "github.com/wtkeqrf0/restService/pkg/ent"
-	postgres "github.com/wtkeqrf0/restService/postgres"
 	gomock "go.uber.org/mock/gomock"
 )
 
