@@ -5,17 +5,16 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	log "github.com/sirupsen/logrus"
 	"github.com/wtkeqrf0/restService/api"
 	"github.com/wtkeqrf0/restService/configs"
-	"github.com/wtkeqrf0/restService/enricher"
 	"github.com/wtkeqrf0/restService/graph"
-	"github.com/wtkeqrf0/restService/kafka"
-	"github.com/wtkeqrf0/restService/postgres"
-	"github.com/wtkeqrf0/restService/redis"
+	"github.com/wtkeqrf0/restService/internal/enricher"
+	"github.com/wtkeqrf0/restService/internal/kafka"
+	"github.com/wtkeqrf0/restService/internal/postgres"
+	"github.com/wtkeqrf0/restService/internal/redis"
 	"github.com/wtkeqrf0/restService/rest"
 	"net/http"
 	"os"
@@ -41,7 +40,6 @@ func main() {
 	}, Timeout: time.Second * 5}
 
 	// TODO: postgres migration (without schema creation)
-	// TODO: delete context
 	ctrl.Postgres = postgres.New(cfg.Connections.PostgresURL)
 	ctrl.Redis = redis.New(cfg.Connections.Redis.Addr, cfg.Connections.Redis.Password)
 	ctrl.Enricher = enricher.New(
@@ -63,10 +61,6 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger, middleware.Recoverer, middleware.Timeout(60*time.Second))
-
-	// TODO: delete
-	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	// TODO: delete
 
 	// REST handlers
 	r.Route("/fio", func(r chi.Router) {
