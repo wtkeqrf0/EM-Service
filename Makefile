@@ -7,22 +7,10 @@ init:
 	@docker-compose up -d
 
 run:
-	@go run main.go
-
-generate:
-	@go generate ./...
+	@go run cmd/main.go
 
 test:
 	@go test ./...
-
-migration_up:
-	migrate -path database/migration/ -database "postgresql://username:secretkey@localhost:5432/database_name?sslmode=disable" -verbose up
-
-migration_down:
-	migrate -path database/migration/ -database "postgresql://username:secretkey@localhost:5432/database_name?sslmode=disable" -verbose down
-
-migration_fix:
-	migrate -path database/migration/ -database "postgresql://username:secretkey@localhost:5432/database_name?sslmode=disable" force VERSION
 
 help:
 	@echo Below are the commands provided by the `Makefile` file.
@@ -30,6 +18,5 @@ help:
 	@echo
 	@echo `dep` - download `go.mod` dependicies. This is required command for a newly installed project.
 	@echo `init` - download and start the MySQL server by Docker. This is required command for a newly installed project.
-	@echo `run` - start the gRPC server.
+	@echo `run` - start the server.
 	@echo `test` - run on the tests.
-	@echo `test_coverage` - run on the tests and generate coverage file.
