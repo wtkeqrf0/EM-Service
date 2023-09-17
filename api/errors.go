@@ -51,11 +51,11 @@ func newValidationError(errs validator.ValidationErrors) *ValidationError {
 	}
 }
 
-type Error struct {
+type AbstractError struct {
 	MyError `json:"-"`
-	Error   error `json:"error"`
+	Err     error `json:"error"`
 }
 
-func newError(err error, et ErrorType) *Error {
-	return &Error{Error: err, MyError: MyError{Type: et}}
+func newError(err error, et ErrorType) AbstractError {
+	return AbstractError{Err: err, MyError: MyError{Type: et}}
 }
