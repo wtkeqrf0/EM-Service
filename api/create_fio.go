@@ -15,6 +15,8 @@ type CreateFIOResponse struct {
 	FailedFIOs []*FailedFio `json:"failed_fios"`
 }
 
+// CreateFIO validates and produces a bulk of given FIOs.
+// Returns a slice of FIOs, which have not passed validation.
 func (s *Server) CreateFIO(ctx context.Context, r CreateFIORequest) (CreateFIOResponse, error) {
 	var gw sync.WaitGroup
 	var m sync.Mutex

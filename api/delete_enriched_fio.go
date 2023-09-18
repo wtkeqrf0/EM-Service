@@ -24,6 +24,8 @@ func (r DeleteEnrichedFIORequest) Validate() error {
 	return newValidationError(errs)
 }
 
+// DeleteEnrichedFIO deletes the FIO from database by id.
+// Returns deleted FIO.
 func (s *Server) DeleteEnrichedFIO(ctx context.Context, r DeleteEnrichedFIORequest) (DeleteEnrichedFIOResponse, error) {
 	user, err := s.ctrl.DeleteUser(ctx, r.ID)
 	if err != nil {

@@ -25,6 +25,8 @@ func (r UpdateEnrichedFIORequest) Validate() error {
 	return newValidationError(errs)
 }
 
+// UpdateEnrichedFIO updates FIO by ID from database.
+// Returns an updated FIO.
 func (s *Server) UpdateEnrichedFIO(ctx context.Context, r UpdateEnrichedFIORequest) (UpdateEnrichedFIOResponse, error) {
 	user, err := s.ctrl.UpdateUser(ctx, postgres.UpdateEnrichedFIO(r.EnrichedFio))
 	if err != nil {

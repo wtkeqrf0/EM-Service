@@ -24,6 +24,10 @@ func (r GetEnrichedFIORequest) Validate() error {
 	return newValidationError(errs)
 }
 
+// GetEnrichedFIO tries to get FIOs from database.
+//
+// If this function was caused by the same Request,
+// return value will be retrieved from the cache.
 func (s *Server) GetEnrichedFIO(ctx context.Context, r GetEnrichedFIORequest) (GetEnrichedFIOResponse, error) {
 
 	key, err := s.ctrl.CacheKey(r)
