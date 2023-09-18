@@ -5,51 +5,51 @@ package ent
 import (
 	"time"
 
+	"github.com/wtkeqrf0/restService/pkg/ent/enrichedfio"
 	"github.com/wtkeqrf0/restService/pkg/ent/schema"
-	"github.com/wtkeqrf0/restService/pkg/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	userMixin := schema.User{}.Mixin()
-	userMixinFields0 := userMixin[0].Fields()
-	_ = userMixinFields0
-	userFields := schema.User{}.Fields()
-	_ = userFields
-	// userDescCreateTime is the schema descriptor for create_time field.
-	userDescCreateTime := userMixinFields0[0].Descriptor()
-	// user.DefaultCreateTime holds the default value on creation for the create_time field.
-	user.DefaultCreateTime = userDescCreateTime.Default.(func() time.Time)
-	// userDescUpdateTime is the schema descriptor for update_time field.
-	userDescUpdateTime := userMixinFields0[1].Descriptor()
-	// user.DefaultUpdateTime holds the default value on creation for the update_time field.
-	user.DefaultUpdateTime = userDescUpdateTime.Default.(func() time.Time)
-	// user.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	user.UpdateDefaultUpdateTime = userDescUpdateTime.UpdateDefault.(func() time.Time)
-	// userDescName is the schema descriptor for name field.
-	userDescName := userFields[0].Descriptor()
-	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	user.NameValidator = userDescName.Validators[0].(func(string) error)
-	// userDescSurname is the schema descriptor for surname field.
-	userDescSurname := userFields[1].Descriptor()
-	// user.SurnameValidator is a validator for the "surname" field. It is called by the builders before save.
-	user.SurnameValidator = userDescSurname.Validators[0].(func(string) error)
-	// userDescPatronymic is the schema descriptor for patronymic field.
-	userDescPatronymic := userFields[2].Descriptor()
-	// user.PatronymicValidator is a validator for the "patronymic" field. It is called by the builders before save.
-	user.PatronymicValidator = userDescPatronymic.Validators[0].(func(string) error)
-	// userDescAge is the schema descriptor for age field.
-	userDescAge := userFields[3].Descriptor()
-	// user.AgeValidator is a validator for the "age" field. It is called by the builders before save.
-	user.AgeValidator = userDescAge.Validators[0].(func(int) error)
-	// userDescGender is the schema descriptor for gender field.
-	userDescGender := userFields[4].Descriptor()
-	// user.GenderValidator is a validator for the "gender" field. It is called by the builders before save.
-	user.GenderValidator = userDescGender.Validators[0].(func(string) error)
-	// userDescCountry is the schema descriptor for country field.
-	userDescCountry := userFields[5].Descriptor()
-	// user.CountryValidator is a validator for the "country" field. It is called by the builders before save.
-	user.CountryValidator = userDescCountry.Validators[0].(func(string) error)
+	enrichedfioMixin := schema.EnrichedFio{}.Mixin()
+	enrichedfioMixinFields0 := enrichedfioMixin[0].Fields()
+	_ = enrichedfioMixinFields0
+	enrichedfioFields := schema.EnrichedFio{}.Fields()
+	_ = enrichedfioFields
+	// enrichedfioDescCreateTime is the schema descriptor for create_time field.
+	enrichedfioDescCreateTime := enrichedfioMixinFields0[0].Descriptor()
+	// enrichedfio.DefaultCreateTime holds the default value on creation for the create_time field.
+	enrichedfio.DefaultCreateTime = enrichedfioDescCreateTime.Default.(func() time.Time)
+	// enrichedfioDescUpdateTime is the schema descriptor for update_time field.
+	enrichedfioDescUpdateTime := enrichedfioMixinFields0[1].Descriptor()
+	// enrichedfio.DefaultUpdateTime holds the default value on creation for the update_time field.
+	enrichedfio.DefaultUpdateTime = enrichedfioDescUpdateTime.Default.(func() time.Time)
+	// enrichedfio.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	enrichedfio.UpdateDefaultUpdateTime = enrichedfioDescUpdateTime.UpdateDefault.(func() time.Time)
+	// enrichedfioDescName is the schema descriptor for name field.
+	enrichedfioDescName := enrichedfioFields[0].Descriptor()
+	// enrichedfio.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	enrichedfio.NameValidator = enrichedfioDescName.Validators[0].(func(string) error)
+	// enrichedfioDescSurname is the schema descriptor for surname field.
+	enrichedfioDescSurname := enrichedfioFields[1].Descriptor()
+	// enrichedfio.SurnameValidator is a validator for the "surname" field. It is called by the builders before save.
+	enrichedfio.SurnameValidator = enrichedfioDescSurname.Validators[0].(func(string) error)
+	// enrichedfioDescPatronymic is the schema descriptor for patronymic field.
+	enrichedfioDescPatronymic := enrichedfioFields[2].Descriptor()
+	// enrichedfio.PatronymicValidator is a validator for the "patronymic" field. It is called by the builders before save.
+	enrichedfio.PatronymicValidator = enrichedfioDescPatronymic.Validators[0].(func(string) error)
+	// enrichedfioDescAge is the schema descriptor for age field.
+	enrichedfioDescAge := enrichedfioFields[3].Descriptor()
+	// enrichedfio.AgeValidator is a validator for the "age" field. It is called by the builders before save.
+	enrichedfio.AgeValidator = enrichedfioDescAge.Validators[0].(func(int) error)
+	// enrichedfioDescGender is the schema descriptor for gender field.
+	enrichedfioDescGender := enrichedfioFields[4].Descriptor()
+	// enrichedfio.GenderValidator is a validator for the "gender" field. It is called by the builders before save.
+	enrichedfio.GenderValidator = enrichedfioDescGender.Validators[0].(func(string) error)
+	// enrichedfioDescCountry is the schema descriptor for country field.
+	enrichedfioDescCountry := enrichedfioFields[5].Descriptor()
+	// enrichedfio.CountryValidator is a validator for the "country" field. It is called by the builders before save.
+	enrichedfio.CountryValidator = enrichedfioDescCountry.Validators[0].(func(string) error)
 }

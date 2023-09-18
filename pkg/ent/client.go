@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"github.com/wtkeqrf0/restService/pkg/ent/user"
+	"github.com/wtkeqrf0/restService/pkg/ent/enrichedfio"
 )
 
 // Client is the client that holds all ent builders.
@@ -21,8 +21,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// User is the client for interacting with the User builders.
-	User *UserClient
+	// EnrichedFio is the client for interacting with the EnrichedFio builders.
+	EnrichedFio *EnrichedFioClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,7 +36,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.User = NewUserClient(c.config)
+	c.EnrichedFio = NewEnrichedFioClient(c.config)
 }
 
 type (
@@ -117,9 +117,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		EnrichedFio: NewEnrichedFioClient(cfg),
 	}, nil
 }
 
@@ -137,16 +137,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		EnrichedFio: NewEnrichedFioClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		EnrichedFio.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -168,111 +168,111 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.User.Use(hooks...)
+	c.EnrichedFio.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.User.Intercept(interceptors...)
+	c.EnrichedFio.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *UserMutation:
-		return c.User.mutate(ctx, m)
+	case *EnrichedFioMutation:
+		return c.EnrichedFio.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
 }
 
-// UserClient is a client for the User schema.
-type UserClient struct {
+// EnrichedFioClient is a client for the EnrichedFio schema.
+type EnrichedFioClient struct {
 	config
 }
 
-// NewUserClient returns a client for the User from the given config.
-func NewUserClient(c config) *UserClient {
-	return &UserClient{config: c}
+// NewEnrichedFioClient returns a client for the EnrichedFio from the given config.
+func NewEnrichedFioClient(c config) *EnrichedFioClient {
+	return &EnrichedFioClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `user.Hooks(f(g(h())))`.
-func (c *UserClient) Use(hooks ...Hook) {
-	c.hooks.User = append(c.hooks.User, hooks...)
+// A call to `Use(f, g, h)` equals to `enrichedfio.Hooks(f(g(h())))`.
+func (c *EnrichedFioClient) Use(hooks ...Hook) {
+	c.hooks.EnrichedFio = append(c.hooks.EnrichedFio, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `user.Intercept(f(g(h())))`.
-func (c *UserClient) Intercept(interceptors ...Interceptor) {
-	c.inters.User = append(c.inters.User, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `enrichedfio.Intercept(f(g(h())))`.
+func (c *EnrichedFioClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EnrichedFio = append(c.inters.EnrichedFio, interceptors...)
 }
 
-// Create returns a builder for creating a User entity.
-func (c *UserClient) Create() *UserCreate {
-	mutation := newUserMutation(c.config, OpCreate)
-	return &UserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a EnrichedFio entity.
+func (c *EnrichedFioClient) Create() *EnrichedFioCreate {
+	mutation := newEnrichedFioMutation(c.config, OpCreate)
+	return &EnrichedFioCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of User entities.
-func (c *UserClient) CreateBulk(builders ...*UserCreate) *UserCreateBulk {
-	return &UserCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of EnrichedFio entities.
+func (c *EnrichedFioClient) CreateBulk(builders ...*EnrichedFioCreate) *EnrichedFioCreateBulk {
+	return &EnrichedFioCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for User.
-func (c *UserClient) Update() *UserUpdate {
-	mutation := newUserMutation(c.config, OpUpdate)
-	return &UserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for EnrichedFio.
+func (c *EnrichedFioClient) Update() *EnrichedFioUpdate {
+	mutation := newEnrichedFioMutation(c.config, OpUpdate)
+	return &EnrichedFioUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
-	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EnrichedFioClient) UpdateOne(ef *EnrichedFio) *EnrichedFioUpdateOne {
+	mutation := newEnrichedFioMutation(c.config, OpUpdateOne, withEnrichedFio(ef))
+	return &EnrichedFioUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *UserClient) UpdateOneID(id int) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
-	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EnrichedFioClient) UpdateOneID(id int) *EnrichedFioUpdateOne {
+	mutation := newEnrichedFioMutation(c.config, OpUpdateOne, withEnrichedFioID(id))
+	return &EnrichedFioUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for User.
-func (c *UserClient) Delete() *UserDelete {
-	mutation := newUserMutation(c.config, OpDelete)
-	return &UserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for EnrichedFio.
+func (c *EnrichedFioClient) Delete() *EnrichedFioDelete {
+	mutation := newEnrichedFioMutation(c.config, OpDelete)
+	return &EnrichedFioDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
-	return c.DeleteOneID(u.ID)
+func (c *EnrichedFioClient) DeleteOne(ef *EnrichedFio) *EnrichedFioDeleteOne {
+	return c.DeleteOneID(ef.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *UserClient) DeleteOneID(id int) *UserDeleteOne {
-	builder := c.Delete().Where(user.ID(id))
+func (c *EnrichedFioClient) DeleteOneID(id int) *EnrichedFioDeleteOne {
+	builder := c.Delete().Where(enrichedfio.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &UserDeleteOne{builder}
+	return &EnrichedFioDeleteOne{builder}
 }
 
-// Query returns a query builder for User.
-func (c *UserClient) Query() *UserQuery {
-	return &UserQuery{
+// Query returns a query builder for EnrichedFio.
+func (c *EnrichedFioClient) Query() *EnrichedFioQuery {
+	return &EnrichedFioQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeUser},
+		ctx:    &QueryContext{Type: TypeEnrichedFio},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a User entity by its id.
-func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
-	return c.Query().Where(user.ID(id)).Only(ctx)
+// Get returns a EnrichedFio entity by its id.
+func (c *EnrichedFioClient) Get(ctx context.Context, id int) (*EnrichedFio, error) {
+	return c.Query().Where(enrichedfio.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *UserClient) GetX(ctx context.Context, id int) *User {
+func (c *EnrichedFioClient) GetX(ctx context.Context, id int) *EnrichedFio {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -281,36 +281,36 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 }
 
 // Hooks returns the client hooks.
-func (c *UserClient) Hooks() []Hook {
-	return c.hooks.User
+func (c *EnrichedFioClient) Hooks() []Hook {
+	return c.hooks.EnrichedFio
 }
 
 // Interceptors returns the client interceptors.
-func (c *UserClient) Interceptors() []Interceptor {
-	return c.inters.User
+func (c *EnrichedFioClient) Interceptors() []Interceptor {
+	return c.inters.EnrichedFio
 }
 
-func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error) {
+func (c *EnrichedFioClient) mutate(ctx context.Context, m *EnrichedFioMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&UserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EnrichedFioCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&UserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EnrichedFioUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EnrichedFioUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&UserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EnrichedFioDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown EnrichedFio mutation op: %q", m.Op())
 	}
 }
 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		User []ent.Hook
+		EnrichedFio []ent.Hook
 	}
 	inters struct {
-		User []ent.Interceptor
+		EnrichedFio []ent.Interceptor
 	}
 )

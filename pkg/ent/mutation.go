@@ -11,8 +11,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/wtkeqrf0/restService/pkg/ent/enrichedfio"
 	"github.com/wtkeqrf0/restService/pkg/ent/predicate"
-	"github.com/wtkeqrf0/restService/pkg/ent/user"
 )
 
 const (
@@ -24,11 +24,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeUser = "User"
+	TypeEnrichedFio = "EnrichedFio"
 )
 
-// UserMutation represents an operation that mutates the User nodes in the graph.
-type UserMutation struct {
+// EnrichedFioMutation represents an operation that mutates the EnrichedFio nodes in the graph.
+type EnrichedFioMutation struct {
 	config
 	op            Op
 	typ           string
@@ -44,21 +44,21 @@ type UserMutation struct {
 	country       *string
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	oldValue      func(context.Context) (*EnrichedFio, error)
+	predicates    []predicate.EnrichedFio
 }
 
-var _ ent.Mutation = (*UserMutation)(nil)
+var _ ent.Mutation = (*EnrichedFioMutation)(nil)
 
-// userOption allows management of the mutation configuration using functional options.
-type userOption func(*UserMutation)
+// enrichedfioOption allows management of the mutation configuration using functional options.
+type enrichedfioOption func(*EnrichedFioMutation)
 
-// newUserMutation creates new mutation for the User entity.
-func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
-	m := &UserMutation{
+// newEnrichedFioMutation creates new mutation for the EnrichedFio entity.
+func newEnrichedFioMutation(c config, op Op, opts ...enrichedfioOption) *EnrichedFioMutation {
+	m := &EnrichedFioMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeUser,
+		typ:           TypeEnrichedFio,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -67,20 +67,20 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 	return m
 }
 
-// withUserID sets the ID field of the mutation.
-func withUserID(id int) userOption {
-	return func(m *UserMutation) {
+// withEnrichedFioID sets the ID field of the mutation.
+func withEnrichedFioID(id int) enrichedfioOption {
+	return func(m *EnrichedFioMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *User
+			value *EnrichedFio
 		)
-		m.oldValue = func(ctx context.Context) (*User, error) {
+		m.oldValue = func(ctx context.Context) (*EnrichedFio, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().User.Get(ctx, id)
+					value, err = m.Client().EnrichedFio.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -89,10 +89,10 @@ func withUserID(id int) userOption {
 	}
 }
 
-// withUser sets the old User of the mutation.
-func withUser(node *User) userOption {
-	return func(m *UserMutation) {
-		m.oldValue = func(context.Context) (*User, error) {
+// withEnrichedFio sets the old EnrichedFio of the mutation.
+func withEnrichedFio(node *EnrichedFio) enrichedfioOption {
+	return func(m *EnrichedFioMutation) {
+		m.oldValue = func(context.Context) (*EnrichedFio, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -101,7 +101,7 @@ func withUser(node *User) userOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m UserMutation) Client() *Client {
+func (m EnrichedFioMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -109,7 +109,7 @@ func (m UserMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m UserMutation) Tx() (*Tx, error) {
+func (m EnrichedFioMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -120,7 +120,7 @@ func (m UserMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *UserMutation) ID() (id int, exists bool) {
+func (m *EnrichedFioMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -131,7 +131,7 @@ func (m *UserMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *EnrichedFioMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -140,19 +140,19 @@ func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().User.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().EnrichedFio.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *UserMutation) SetCreateTime(t time.Time) {
+func (m *EnrichedFioMutation) SetCreateTime(t time.Time) {
 	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *UserMutation) CreateTime() (r time.Time, exists bool) {
+func (m *EnrichedFioMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -160,10 +160,10 @@ func (m *UserMutation) CreateTime() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldCreateTime returns the old "create_time" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldCreateTime returns the old "create_time" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+func (m *EnrichedFioMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -178,17 +178,17 @@ func (m *UserMutation) OldCreateTime(ctx context.Context) (v time.Time, err erro
 }
 
 // ResetCreateTime resets all changes to the "create_time" field.
-func (m *UserMutation) ResetCreateTime() {
+func (m *EnrichedFioMutation) ResetCreateTime() {
 	m.create_time = nil
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (m *UserMutation) SetUpdateTime(t time.Time) {
+func (m *EnrichedFioMutation) SetUpdateTime(t time.Time) {
 	m.update_time = &t
 }
 
 // UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *UserMutation) UpdateTime() (r time.Time, exists bool) {
+func (m *EnrichedFioMutation) UpdateTime() (r time.Time, exists bool) {
 	v := m.update_time
 	if v == nil {
 		return
@@ -196,10 +196,10 @@ func (m *UserMutation) UpdateTime() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldUpdateTime returns the old "update_time" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdateTime returns the old "update_time" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+func (m *EnrichedFioMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
 	}
@@ -214,17 +214,17 @@ func (m *UserMutation) OldUpdateTime(ctx context.Context) (v time.Time, err erro
 }
 
 // ResetUpdateTime resets all changes to the "update_time" field.
-func (m *UserMutation) ResetUpdateTime() {
+func (m *EnrichedFioMutation) ResetUpdateTime() {
 	m.update_time = nil
 }
 
 // SetName sets the "name" field.
-func (m *UserMutation) SetName(s string) {
+func (m *EnrichedFioMutation) SetName(s string) {
 	m.name = &s
 }
 
 // Name returns the value of the "name" field in the mutation.
-func (m *UserMutation) Name() (r string, exists bool) {
+func (m *EnrichedFioMutation) Name() (r string, exists bool) {
 	v := m.name
 	if v == nil {
 		return
@@ -232,10 +232,10 @@ func (m *UserMutation) Name() (r string, exists bool) {
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldName returns the old "name" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *EnrichedFioMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
@@ -250,17 +250,17 @@ func (m *UserMutation) OldName(ctx context.Context) (v string, err error) {
 }
 
 // ResetName resets all changes to the "name" field.
-func (m *UserMutation) ResetName() {
+func (m *EnrichedFioMutation) ResetName() {
 	m.name = nil
 }
 
 // SetSurname sets the "surname" field.
-func (m *UserMutation) SetSurname(s string) {
+func (m *EnrichedFioMutation) SetSurname(s string) {
 	m.surname = &s
 }
 
 // Surname returns the value of the "surname" field in the mutation.
-func (m *UserMutation) Surname() (r string, exists bool) {
+func (m *EnrichedFioMutation) Surname() (r string, exists bool) {
 	v := m.surname
 	if v == nil {
 		return
@@ -268,10 +268,10 @@ func (m *UserMutation) Surname() (r string, exists bool) {
 	return *v, true
 }
 
-// OldSurname returns the old "surname" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldSurname returns the old "surname" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldSurname(ctx context.Context) (v string, err error) {
+func (m *EnrichedFioMutation) OldSurname(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSurname is only allowed on UpdateOne operations")
 	}
@@ -286,17 +286,17 @@ func (m *UserMutation) OldSurname(ctx context.Context) (v string, err error) {
 }
 
 // ResetSurname resets all changes to the "surname" field.
-func (m *UserMutation) ResetSurname() {
+func (m *EnrichedFioMutation) ResetSurname() {
 	m.surname = nil
 }
 
 // SetPatronymic sets the "patronymic" field.
-func (m *UserMutation) SetPatronymic(s string) {
+func (m *EnrichedFioMutation) SetPatronymic(s string) {
 	m.patronymic = &s
 }
 
 // Patronymic returns the value of the "patronymic" field in the mutation.
-func (m *UserMutation) Patronymic() (r string, exists bool) {
+func (m *EnrichedFioMutation) Patronymic() (r string, exists bool) {
 	v := m.patronymic
 	if v == nil {
 		return
@@ -304,10 +304,10 @@ func (m *UserMutation) Patronymic() (r string, exists bool) {
 	return *v, true
 }
 
-// OldPatronymic returns the old "patronymic" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldPatronymic returns the old "patronymic" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldPatronymic(ctx context.Context) (v *string, err error) {
+func (m *EnrichedFioMutation) OldPatronymic(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPatronymic is only allowed on UpdateOne operations")
 	}
@@ -322,31 +322,31 @@ func (m *UserMutation) OldPatronymic(ctx context.Context) (v *string, err error)
 }
 
 // ClearPatronymic clears the value of the "patronymic" field.
-func (m *UserMutation) ClearPatronymic() {
+func (m *EnrichedFioMutation) ClearPatronymic() {
 	m.patronymic = nil
-	m.clearedFields[user.FieldPatronymic] = struct{}{}
+	m.clearedFields[enrichedfio.FieldPatronymic] = struct{}{}
 }
 
 // PatronymicCleared returns if the "patronymic" field was cleared in this mutation.
-func (m *UserMutation) PatronymicCleared() bool {
-	_, ok := m.clearedFields[user.FieldPatronymic]
+func (m *EnrichedFioMutation) PatronymicCleared() bool {
+	_, ok := m.clearedFields[enrichedfio.FieldPatronymic]
 	return ok
 }
 
 // ResetPatronymic resets all changes to the "patronymic" field.
-func (m *UserMutation) ResetPatronymic() {
+func (m *EnrichedFioMutation) ResetPatronymic() {
 	m.patronymic = nil
-	delete(m.clearedFields, user.FieldPatronymic)
+	delete(m.clearedFields, enrichedfio.FieldPatronymic)
 }
 
 // SetAge sets the "age" field.
-func (m *UserMutation) SetAge(i int) {
+func (m *EnrichedFioMutation) SetAge(i int) {
 	m.age = &i
 	m.addage = nil
 }
 
 // Age returns the value of the "age" field in the mutation.
-func (m *UserMutation) Age() (r int, exists bool) {
+func (m *EnrichedFioMutation) Age() (r int, exists bool) {
 	v := m.age
 	if v == nil {
 		return
@@ -354,10 +354,10 @@ func (m *UserMutation) Age() (r int, exists bool) {
 	return *v, true
 }
 
-// OldAge returns the old "age" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldAge returns the old "age" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldAge(ctx context.Context) (v int, err error) {
+func (m *EnrichedFioMutation) OldAge(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAge is only allowed on UpdateOne operations")
 	}
@@ -372,7 +372,7 @@ func (m *UserMutation) OldAge(ctx context.Context) (v int, err error) {
 }
 
 // AddAge adds i to the "age" field.
-func (m *UserMutation) AddAge(i int) {
+func (m *EnrichedFioMutation) AddAge(i int) {
 	if m.addage != nil {
 		*m.addage += i
 	} else {
@@ -381,7 +381,7 @@ func (m *UserMutation) AddAge(i int) {
 }
 
 // AddedAge returns the value that was added to the "age" field in this mutation.
-func (m *UserMutation) AddedAge() (r int, exists bool) {
+func (m *EnrichedFioMutation) AddedAge() (r int, exists bool) {
 	v := m.addage
 	if v == nil {
 		return
@@ -390,18 +390,18 @@ func (m *UserMutation) AddedAge() (r int, exists bool) {
 }
 
 // ResetAge resets all changes to the "age" field.
-func (m *UserMutation) ResetAge() {
+func (m *EnrichedFioMutation) ResetAge() {
 	m.age = nil
 	m.addage = nil
 }
 
 // SetGender sets the "gender" field.
-func (m *UserMutation) SetGender(s string) {
+func (m *EnrichedFioMutation) SetGender(s string) {
 	m.gender = &s
 }
 
 // Gender returns the value of the "gender" field in the mutation.
-func (m *UserMutation) Gender() (r string, exists bool) {
+func (m *EnrichedFioMutation) Gender() (r string, exists bool) {
 	v := m.gender
 	if v == nil {
 		return
@@ -409,10 +409,10 @@ func (m *UserMutation) Gender() (r string, exists bool) {
 	return *v, true
 }
 
-// OldGender returns the old "gender" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldGender returns the old "gender" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldGender(ctx context.Context) (v string, err error) {
+func (m *EnrichedFioMutation) OldGender(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldGender is only allowed on UpdateOne operations")
 	}
@@ -427,17 +427,17 @@ func (m *UserMutation) OldGender(ctx context.Context) (v string, err error) {
 }
 
 // ResetGender resets all changes to the "gender" field.
-func (m *UserMutation) ResetGender() {
+func (m *EnrichedFioMutation) ResetGender() {
 	m.gender = nil
 }
 
 // SetCountry sets the "country" field.
-func (m *UserMutation) SetCountry(s string) {
+func (m *EnrichedFioMutation) SetCountry(s string) {
 	m.country = &s
 }
 
 // Country returns the value of the "country" field in the mutation.
-func (m *UserMutation) Country() (r string, exists bool) {
+func (m *EnrichedFioMutation) Country() (r string, exists bool) {
 	v := m.country
 	if v == nil {
 		return
@@ -445,10 +445,10 @@ func (m *UserMutation) Country() (r string, exists bool) {
 	return *v, true
 }
 
-// OldCountry returns the old "country" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
+// OldCountry returns the old "country" field's value of the EnrichedFio entity.
+// If the EnrichedFio object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldCountry(ctx context.Context) (v string, err error) {
+func (m *EnrichedFioMutation) OldCountry(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCountry is only allowed on UpdateOne operations")
 	}
@@ -463,19 +463,19 @@ func (m *UserMutation) OldCountry(ctx context.Context) (v string, err error) {
 }
 
 // ResetCountry resets all changes to the "country" field.
-func (m *UserMutation) ResetCountry() {
+func (m *EnrichedFioMutation) ResetCountry() {
 	m.country = nil
 }
 
-// Where appends a list predicates to the UserMutation builder.
-func (m *UserMutation) Where(ps ...predicate.User) {
+// Where appends a list predicates to the EnrichedFioMutation builder.
+func (m *EnrichedFioMutation) Where(ps ...predicate.EnrichedFio) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the UserMutation builder. Using this method,
+// WhereP appends storage-level predicates to the EnrichedFioMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *UserMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.User, len(ps))
+func (m *EnrichedFioMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EnrichedFio, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -483,48 +483,48 @@ func (m *UserMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *UserMutation) Op() Op {
+func (m *EnrichedFioMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *UserMutation) SetOp(op Op) {
+func (m *EnrichedFioMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (User).
-func (m *UserMutation) Type() string {
+// Type returns the node type of this mutation (EnrichedFio).
+func (m *EnrichedFioMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *UserMutation) Fields() []string {
+func (m *EnrichedFioMutation) Fields() []string {
 	fields := make([]string, 0, 8)
 	if m.create_time != nil {
-		fields = append(fields, user.FieldCreateTime)
+		fields = append(fields, enrichedfio.FieldCreateTime)
 	}
 	if m.update_time != nil {
-		fields = append(fields, user.FieldUpdateTime)
+		fields = append(fields, enrichedfio.FieldUpdateTime)
 	}
 	if m.name != nil {
-		fields = append(fields, user.FieldName)
+		fields = append(fields, enrichedfio.FieldName)
 	}
 	if m.surname != nil {
-		fields = append(fields, user.FieldSurname)
+		fields = append(fields, enrichedfio.FieldSurname)
 	}
 	if m.patronymic != nil {
-		fields = append(fields, user.FieldPatronymic)
+		fields = append(fields, enrichedfio.FieldPatronymic)
 	}
 	if m.age != nil {
-		fields = append(fields, user.FieldAge)
+		fields = append(fields, enrichedfio.FieldAge)
 	}
 	if m.gender != nil {
-		fields = append(fields, user.FieldGender)
+		fields = append(fields, enrichedfio.FieldGender)
 	}
 	if m.country != nil {
-		fields = append(fields, user.FieldCountry)
+		fields = append(fields, enrichedfio.FieldCountry)
 	}
 	return fields
 }
@@ -532,23 +532,23 @@ func (m *UserMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *UserMutation) Field(name string) (ent.Value, bool) {
+func (m *EnrichedFioMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case user.FieldCreateTime:
+	case enrichedfio.FieldCreateTime:
 		return m.CreateTime()
-	case user.FieldUpdateTime:
+	case enrichedfio.FieldUpdateTime:
 		return m.UpdateTime()
-	case user.FieldName:
+	case enrichedfio.FieldName:
 		return m.Name()
-	case user.FieldSurname:
+	case enrichedfio.FieldSurname:
 		return m.Surname()
-	case user.FieldPatronymic:
+	case enrichedfio.FieldPatronymic:
 		return m.Patronymic()
-	case user.FieldAge:
+	case enrichedfio.FieldAge:
 		return m.Age()
-	case user.FieldGender:
+	case enrichedfio.FieldGender:
 		return m.Gender()
-	case user.FieldCountry:
+	case enrichedfio.FieldCountry:
 		return m.Country()
 	}
 	return nil, false
@@ -557,83 +557,83 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *EnrichedFioMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case user.FieldCreateTime:
+	case enrichedfio.FieldCreateTime:
 		return m.OldCreateTime(ctx)
-	case user.FieldUpdateTime:
+	case enrichedfio.FieldUpdateTime:
 		return m.OldUpdateTime(ctx)
-	case user.FieldName:
+	case enrichedfio.FieldName:
 		return m.OldName(ctx)
-	case user.FieldSurname:
+	case enrichedfio.FieldSurname:
 		return m.OldSurname(ctx)
-	case user.FieldPatronymic:
+	case enrichedfio.FieldPatronymic:
 		return m.OldPatronymic(ctx)
-	case user.FieldAge:
+	case enrichedfio.FieldAge:
 		return m.OldAge(ctx)
-	case user.FieldGender:
+	case enrichedfio.FieldGender:
 		return m.OldGender(ctx)
-	case user.FieldCountry:
+	case enrichedfio.FieldCountry:
 		return m.OldCountry(ctx)
 	}
-	return nil, fmt.Errorf("unknown User field %s", name)
+	return nil, fmt.Errorf("unknown EnrichedFio field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *UserMutation) SetField(name string, value ent.Value) error {
+func (m *EnrichedFioMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldCreateTime:
+	case enrichedfio.FieldCreateTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
-	case user.FieldUpdateTime:
+	case enrichedfio.FieldUpdateTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdateTime(v)
 		return nil
-	case user.FieldName:
+	case enrichedfio.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
 		return nil
-	case user.FieldSurname:
+	case enrichedfio.FieldSurname:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSurname(v)
 		return nil
-	case user.FieldPatronymic:
+	case enrichedfio.FieldPatronymic:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPatronymic(v)
 		return nil
-	case user.FieldAge:
+	case enrichedfio.FieldAge:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAge(v)
 		return nil
-	case user.FieldGender:
+	case enrichedfio.FieldGender:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetGender(v)
 		return nil
-	case user.FieldCountry:
+	case enrichedfio.FieldCountry:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -641,15 +641,15 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetCountry(v)
 		return nil
 	}
-	return fmt.Errorf("unknown User field %s", name)
+	return fmt.Errorf("unknown EnrichedFio field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *UserMutation) AddedFields() []string {
+func (m *EnrichedFioMutation) AddedFields() []string {
 	var fields []string
 	if m.addage != nil {
-		fields = append(fields, user.FieldAge)
+		fields = append(fields, enrichedfio.FieldAge)
 	}
 	return fields
 }
@@ -657,9 +657,9 @@ func (m *UserMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
+func (m *EnrichedFioMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case user.FieldAge:
+	case enrichedfio.FieldAge:
 		return m.AddedAge()
 	}
 	return nil, false
@@ -668,9 +668,9 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *UserMutation) AddField(name string, value ent.Value) error {
+func (m *EnrichedFioMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case user.FieldAge:
+	case enrichedfio.FieldAge:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -678,113 +678,113 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 		m.AddAge(v)
 		return nil
 	}
-	return fmt.Errorf("unknown User numeric field %s", name)
+	return fmt.Errorf("unknown EnrichedFio numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *UserMutation) ClearedFields() []string {
+func (m *EnrichedFioMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(user.FieldPatronymic) {
-		fields = append(fields, user.FieldPatronymic)
+	if m.FieldCleared(enrichedfio.FieldPatronymic) {
+		fields = append(fields, enrichedfio.FieldPatronymic)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *UserMutation) FieldCleared(name string) bool {
+func (m *EnrichedFioMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *UserMutation) ClearField(name string) error {
+func (m *EnrichedFioMutation) ClearField(name string) error {
 	switch name {
-	case user.FieldPatronymic:
+	case enrichedfio.FieldPatronymic:
 		m.ClearPatronymic()
 		return nil
 	}
-	return fmt.Errorf("unknown User nullable field %s", name)
+	return fmt.Errorf("unknown EnrichedFio nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *UserMutation) ResetField(name string) error {
+func (m *EnrichedFioMutation) ResetField(name string) error {
 	switch name {
-	case user.FieldCreateTime:
+	case enrichedfio.FieldCreateTime:
 		m.ResetCreateTime()
 		return nil
-	case user.FieldUpdateTime:
+	case enrichedfio.FieldUpdateTime:
 		m.ResetUpdateTime()
 		return nil
-	case user.FieldName:
+	case enrichedfio.FieldName:
 		m.ResetName()
 		return nil
-	case user.FieldSurname:
+	case enrichedfio.FieldSurname:
 		m.ResetSurname()
 		return nil
-	case user.FieldPatronymic:
+	case enrichedfio.FieldPatronymic:
 		m.ResetPatronymic()
 		return nil
-	case user.FieldAge:
+	case enrichedfio.FieldAge:
 		m.ResetAge()
 		return nil
-	case user.FieldGender:
+	case enrichedfio.FieldGender:
 		m.ResetGender()
 		return nil
-	case user.FieldCountry:
+	case enrichedfio.FieldCountry:
 		m.ResetCountry()
 		return nil
 	}
-	return fmt.Errorf("unknown User field %s", name)
+	return fmt.Errorf("unknown EnrichedFio field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *UserMutation) AddedEdges() []string {
+func (m *EnrichedFioMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *UserMutation) AddedIDs(name string) []ent.Value {
+func (m *EnrichedFioMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *UserMutation) RemovedEdges() []string {
+func (m *EnrichedFioMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *UserMutation) RemovedIDs(name string) []ent.Value {
+func (m *EnrichedFioMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *UserMutation) ClearedEdges() []string {
+func (m *EnrichedFioMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *UserMutation) EdgeCleared(name string) bool {
+func (m *EnrichedFioMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *UserMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown User unique edge %s", name)
+func (m *EnrichedFioMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown EnrichedFio unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *UserMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown User edge %s", name)
+func (m *EnrichedFioMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown EnrichedFio edge %s", name)
 }

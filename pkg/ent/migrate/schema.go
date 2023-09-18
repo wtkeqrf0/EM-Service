@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	// UsersColumns holds the columns for the "users" table.
-	UsersColumns = []*schema.Column{
+	// EnrichedFiosColumns holds the columns for the "enriched_fios" table.
+	EnrichedFiosColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
@@ -20,15 +20,15 @@ var (
 		{Name: "gender", Type: field.TypeString},
 		{Name: "country", Type: field.TypeString},
 	}
-	// UsersTable holds the schema information for the "users" table.
-	UsersTable = &schema.Table{
-		Name:       "users",
-		Columns:    UsersColumns,
-		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	// EnrichedFiosTable holds the schema information for the "enriched_fios" table.
+	EnrichedFiosTable = &schema.Table{
+		Name:       "enriched_fios",
+		Columns:    EnrichedFiosColumns,
+		PrimaryKey: []*schema.Column{EnrichedFiosColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		UsersTable,
+		EnrichedFiosTable,
 	}
 )
 
