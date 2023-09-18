@@ -2,7 +2,8 @@
 Test task for ***Effective mobile*** company.
 
 ## User's guide
-Write `make help` in the project root to get info about project main commands.
+* Write `make help` in the project root to get info about project main commands.
+* To activate *debug mode*, set `PROD` variable to `true` in [.env](configs/.env) file.
 
 ## curl test queries
 ### REST
