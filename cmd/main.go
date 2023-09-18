@@ -39,7 +39,6 @@ func main() {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}, Timeout: time.Second * 5}
 
-	// TODO: postgres migration (without schema creation)
 	ctrl.Postgres = postgres.New(cfg.Connections.PostgresURL)
 	ctrl.Redis = redis.New(cfg.Connections.Redis.Addr, cfg.Connections.Redis.Password)
 	ctrl.Enricher = enricher.New(
@@ -98,6 +97,11 @@ func main() {
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	ctx := context.Background()
+
+	if err = ctrl.InitSchema(ctx); err != nil {
+		log.WithError(err).Fatalf("failed to use migrations")
+	}
+
 	ctrl.Kafka.Consume(ctx, ctrl.Postgres, ctrl.Enricher)
 
 	go func() {
