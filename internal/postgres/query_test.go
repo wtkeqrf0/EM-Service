@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	"github.com/wtkeqrf0/restService/pkg/ent/user"
+	"github.com/wtkeqrf0/restService/pkg/ent/enrichedfio"
 	"testing"
 	"time"
 )
@@ -59,8 +59,8 @@ func TestPostgres_SaveUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	u := cl.cl.User.Query().Where(user.CreateTimeEQ(now)).OnlyX(ctx)
-	defer cl.cl.User.DeleteOne(u).ExecX(ctx)
+	u := cl.cl.EnrichedFio.Query().Where(enrichedfio.CreateTimeEQ(now)).OnlyX(ctx)
+	defer cl.cl.EnrichedFio.DeleteOne(u).ExecX(ctx)
 
 	t.Logf("%+v", u)
 }
@@ -85,9 +85,9 @@ func TestPostgres_UpdateUser(t *testing.T) {
 		CountryID: "RU",
 	}
 
-	u := cl.cl.User.Create().SetName(data.Name).SetSurname(data.Surname).
+	u := cl.cl.EnrichedFio.Create().SetName(data.Name).SetSurname(data.Surname).
 		SetAge(data.Age).SetGender(data.Gender).SetCountry(data.CountryID).SaveX(ctx)
-	defer cl.cl.User.DeleteOneID(u.ID)
+	defer cl.cl.EnrichedFio.DeleteOneID(u.ID)
 
 	newName := "Sasha"
 
@@ -122,7 +122,7 @@ func TestPostgres_DeleteUser(t *testing.T) {
 		CountryID: "RU",
 	}
 
-	u := cl.cl.User.Create().SetName(data.Name).SetSurname(data.Surname).
+	u := cl.cl.EnrichedFio.Create().SetName(data.Name).SetSurname(data.Surname).
 		SetAge(data.Age).SetGender(data.Gender).SetCountry(data.CountryID).SaveX(ctx)
 
 	u, err := cl.DeleteUser(ctx, u.ID)
@@ -130,7 +130,7 @@ func TestPostgres_DeleteUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = cl.cl.User.Get(ctx, u.ID)
+	_, err = cl.cl.EnrichedFio.Get(ctx, u.ID)
 	if err == nil {
 		t.Fatal("user is not deleted")
 	}

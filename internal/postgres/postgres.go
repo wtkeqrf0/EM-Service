@@ -8,7 +8,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	log "github.com/sirupsen/logrus"
 	"github.com/wtkeqrf0/restService/pkg/ent"
-	"github.com/wtkeqrf0/restService/pkg/ent/user"
+	"github.com/wtkeqrf0/restService/pkg/ent/enrichedfio"
 	"time"
 )
 
@@ -55,21 +55,21 @@ type Filter struct {
 }
 
 // Users method gets users with the specified limit, offset, order, maxAge and minAge.
-func (p *Postgres) Users(ctx context.Context, f Filter) (ent.Users, error) {
-	q := p.cl.User.Query().Limit(f.Limit).Offset(f.Offset)
+func (p *Postgres) Users(ctx context.Context, f Filter) (ent.EnrichedFios, error) {
+	q := p.cl.EnrichedFio.Query().Limit(f.Limit).Offset(f.Offset)
 
 	if f.Order != nil && *f.Order == "DESC" {
-		q.Order(ent.Desc(user.FieldSurname, user.FieldName, user.FieldPatronymic))
+		q.Order(ent.Desc(enrichedfio.FieldSurname, enrichedfio.FieldName, enrichedfio.FieldPatronymic))
 	} else {
-		q.Order(ent.Asc(user.FieldSurname, user.FieldName, user.FieldPatronymic))
+		q.Order(ent.Asc(enrichedfio.FieldSurname, enrichedfio.FieldName, enrichedfio.FieldPatronymic))
 	}
 
 	if f.MaxAge != nil {
-		q.Where(user.AgeLT(*f.MaxAge))
+		q.Where(enrichedfio.AgeLT(*f.MaxAge))
 	}
 
 	if f.MinAge != nil {
-		q.Where(user.AgeGTE(*f.MinAge))
+		q.Where(enrichedfio.AgeGTE(*f.MinAge))
 	}
 
 	return q.All(ctx)
@@ -92,7 +92,7 @@ type EnrichedFIOWithCreationTime struct {
 
 // SaveUser to database.
 func (p *Postgres) SaveUser(ctx context.Context, fio EnrichedFIOWithCreationTime) error {
-	return p.cl.User.Create().SetSurname(fio.Surname).
+	return p.cl.EnrichedFio.Create().SetSurname(fio.Surname).
 		SetName(fio.Name).SetNillablePatronymic(fio.Patronymic).
 		SetCountry(fio.CountryID).SetAge(fio.Age).SetGender(fio.Gender).
 		SetCreateTime(fio.CreationTime).Exec(ctx)
@@ -109,8 +109,8 @@ type UpdateEnrichedFIO struct {
 }
 
 // UpdateUser in the database by id.
-func (p *Postgres) UpdateUser(ctx context.Context, fio UpdateEnrichedFIO) (*ent.User, error) {
-	q := p.cl.User.UpdateOneID(fio.ID).SetNillablePatronymic(fio.Patronymic)
+func (p *Postgres) UpdateUser(ctx context.Context, fio UpdateEnrichedFIO) (*ent.EnrichedFio, error) {
+	q := p.cl.EnrichedFio.UpdateOneID(fio.ID).SetNillablePatronymic(fio.Patronymic)
 
 	if fio.Gender != nil {
 		q.SetGender(*fio.Gender)
@@ -136,12 +136,12 @@ func (p *Postgres) UpdateUser(ctx context.Context, fio UpdateEnrichedFIO) (*ent.
 }
 
 // DeleteUser in the database by id.
-func (p *Postgres) DeleteUser(ctx context.Context, id int) (*ent.User, error) {
-	u, err := p.cl.User.Get(ctx, id)
+func (p *Postgres) DeleteUser(ctx context.Context, id int) (*ent.EnrichedFio, error) {
+	u, err := p.cl.EnrichedFio.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return u, p.cl.User.DeleteOne(u).Exec(ctx)
+	return u, p.cl.EnrichedFio.DeleteOne(u).Exec(ctx)
 }
 
 func (p *Postgres) Close() error {

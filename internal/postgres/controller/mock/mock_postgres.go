@@ -51,10 +51,10 @@ func (mr *MockPostgresMockRecorder) Close() *gomock.Call {
 }
 
 // DeleteUser mocks base method.
-func (m *MockPostgres) DeleteUser(ctx context.Context, id int) (*ent.User, error) {
+func (m *MockPostgres) DeleteUser(ctx context.Context, id int) (*ent.EnrichedFio, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", ctx, id)
-	ret0, _ := ret[0].(*ent.User)
+	ret0, _ := ret[0].(*ent.EnrichedFio)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,10 +94,10 @@ func (mr *MockPostgresMockRecorder) SaveUser(ctx, fio interface{}) *gomock.Call 
 }
 
 // UpdateUser mocks base method.
-func (m *MockPostgres) UpdateUser(ctx context.Context, fio postgres.UpdateEnrichedFIO) (*ent.User, error) {
+func (m *MockPostgres) UpdateUser(ctx context.Context, fio postgres.UpdateEnrichedFIO) (*ent.EnrichedFio, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", ctx, fio)
-	ret0, _ := ret[0].(*ent.User)
+	ret0, _ := ret[0].(*ent.EnrichedFio)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -109,10 +109,10 @@ func (mr *MockPostgresMockRecorder) UpdateUser(ctx, fio interface{}) *gomock.Cal
 }
 
 // Users mocks base method.
-func (m *MockPostgres) Users(ctx context.Context, f postgres.Filter) (ent.Users, error) {
+func (m *MockPostgres) Users(ctx context.Context, f postgres.Filter) (ent.EnrichedFios, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Users", ctx, f)
-	ret0, _ := ret[0].(ent.Users)
+	ret0, _ := ret[0].(ent.EnrichedFios)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
