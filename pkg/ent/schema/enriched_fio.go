@@ -6,13 +6,13 @@ import (
 	"entgo.io/ent/schema/mixin"
 )
 
-// User holds the schema definition for the Author entity.
-type User struct {
+// EnrichedFio holds the schema definition for the Author entity.
+type EnrichedFio struct {
 	ent.Schema
 }
 
-// Fields of the User.
-func (User) Fields() []ent.Field {
+// Fields of the EnrichedFio.
+func (EnrichedFio) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty(),
 
@@ -28,7 +28,7 @@ func (User) Fields() []ent.Field {
 	}
 }
 
-func (User) Mixin() []ent.Mixin {
+func (EnrichedFio) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.Time{},
 	}
