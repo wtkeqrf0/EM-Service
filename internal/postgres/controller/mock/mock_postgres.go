@@ -65,6 +65,20 @@ func (mr *MockPostgresMockRecorder) DeleteUser(ctx, id interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockPostgres)(nil).DeleteUser), ctx, id)
 }
 
+// InitSchema mocks base method.
+func (m *MockPostgres) InitSchema(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InitSchema", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InitSchema indicates an expected call of InitSchema.
+func (mr *MockPostgresMockRecorder) InitSchema(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitSchema", reflect.TypeOf((*MockPostgres)(nil).InitSchema), ctx)
+}
+
 // SaveUser mocks base method.
 func (m *MockPostgres) SaveUser(ctx context.Context, fio postgres.EnrichedFIOWithCreationTime) error {
 	m.ctrl.T.Helper()
@@ -95,16 +109,16 @@ func (mr *MockPostgresMockRecorder) UpdateUser(ctx, fio interface{}) *gomock.Cal
 }
 
 // Users mocks base method.
-func (m *MockPostgres) Users(ctx context.Context, p postgres.Filter) (ent.Users, error) {
+func (m *MockPostgres) Users(ctx context.Context, f postgres.Filter) (ent.Users, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Users", ctx, p)
+	ret := m.ctrl.Call(m, "Users", ctx, f)
 	ret0, _ := ret[0].(ent.Users)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Users indicates an expected call of Users.
-func (mr *MockPostgresMockRecorder) Users(ctx, p interface{}) *gomock.Call {
+func (mr *MockPostgresMockRecorder) Users(ctx, f interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Users", reflect.TypeOf((*MockPostgres)(nil).Users), ctx, p)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Users", reflect.TypeOf((*MockPostgres)(nil).Users), ctx, f)
 }

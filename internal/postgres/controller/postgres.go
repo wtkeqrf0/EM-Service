@@ -12,8 +12,9 @@ import (
 
 // Controller describes methods, implemented by the postgres package.
 type Postgres interface {
+	InitSchema(ctx context.Context) error
 	// Users method gets users with the specified limit, offset, order, maxAge and minAge.
-	Users(ctx context.Context, p postgres.Filter) (ent.Users, error)
+	Users(ctx context.Context, f postgres.Filter) (ent.Users, error)
 	// SaveUser to database.
 	SaveUser(ctx context.Context, fio postgres.EnrichedFIOWithCreationTime) error
 	// UpdateUser in the database by id.

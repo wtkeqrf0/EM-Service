@@ -17,6 +17,8 @@ func TestPostgres_Users(t *testing.T) {
 	cl := New(postgresURL)
 	defer cl.Close()
 
+	_ = cl.InitSchema(ctx)
+
 	users, err := cl.Users(ctx, Filter{
 		Limit:  10,
 		Offset: 0,
@@ -37,6 +39,8 @@ func TestPostgres_SaveUser(t *testing.T) {
 
 	cl := New(postgresURL)
 	defer cl.Close()
+
+	_ = cl.InitSchema(ctx)
 
 	data := EnrichedFIO{
 		Name:      "Matvey",
@@ -70,6 +74,8 @@ func TestPostgres_UpdateUser(t *testing.T) {
 
 	cl := New(postgresURL)
 	defer cl.Close()
+
+	_ = cl.InitSchema(ctx)
 
 	data := EnrichedFIO{
 		Name:      "Matvey",
@@ -105,6 +111,8 @@ func TestPostgres_DeleteUser(t *testing.T) {
 
 	cl := New(postgresURL)
 	defer cl.Close()
+
+	_ = cl.InitSchema(ctx)
 
 	data := EnrichedFIO{
 		Name:      "Matvey",

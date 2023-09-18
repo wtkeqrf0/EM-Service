@@ -36,11 +36,12 @@ func New(url string) *Postgres {
 		cl = cl.Debug()
 	}
 
-	if err := cl.Schema.Create(context.Background()); err != nil {
-		log.WithError(err).Fatal("tables initialization failed")
-	}
-
 	return &Postgres{cl: cl}
+}
+
+// InitSchema generates and applies migrations.
+func (p *Postgres) InitSchema(ctx context.Context) error {
+	return p.cl.Schema.Create(ctx)
 }
 
 // Filter contains Pagination, and also the maximum and minimum age.
@@ -54,21 +55,21 @@ type Filter struct {
 }
 
 // Users method gets users with the specified limit, offset, order, maxAge and minAge.
-func (c *Postgres) Users(ctx context.Context, p Filter) (ent.Users, error) {
-	q := c.cl.User.Query().Limit(p.Limit).Offset(p.Offset)
+func (p *Postgres) Users(ctx context.Context, f Filter) (ent.Users, error) {
+	q := p.cl.User.Query().Limit(f.Limit).Offset(f.Offset)
 
-	if p.Order != nil && *p.Order == "DESC" {
+	if f.Order != nil && *f.Order == "DESC" {
 		q.Order(ent.Desc(user.FieldSurname, user.FieldName, user.FieldPatronymic))
 	} else {
 		q.Order(ent.Asc(user.FieldSurname, user.FieldName, user.FieldPatronymic))
 	}
 
-	if p.MaxAge != nil {
-		q.Where(user.AgeLT(*p.MaxAge))
+	if f.MaxAge != nil {
+		q.Where(user.AgeLT(*f.MaxAge))
 	}
 
-	if p.MinAge != nil {
-		q.Where(user.AgeGTE(*p.MinAge))
+	if f.MinAge != nil {
+		q.Where(user.AgeGTE(*f.MinAge))
 	}
 
 	return q.All(ctx)
@@ -90,8 +91,8 @@ type EnrichedFIOWithCreationTime struct {
 }
 
 // SaveUser to database.
-func (c *Postgres) SaveUser(ctx context.Context, fio EnrichedFIOWithCreationTime) error {
-	return c.cl.User.Create().SetSurname(fio.Surname).
+func (p *Postgres) SaveUser(ctx context.Context, fio EnrichedFIOWithCreationTime) error {
+	return p.cl.User.Create().SetSurname(fio.Surname).
 		SetName(fio.Name).SetNillablePatronymic(fio.Patronymic).
 		SetCountry(fio.CountryID).SetAge(fio.Age).SetGender(fio.Gender).
 		SetCreateTime(fio.CreationTime).Exec(ctx)
@@ -108,8 +109,8 @@ type UpdateEnrichedFIO struct {
 }
 
 // UpdateUser in the database by id.
-func (c *Postgres) UpdateUser(ctx context.Context, fio UpdateEnrichedFIO) (*ent.User, error) {
-	q := c.cl.User.UpdateOneID(fio.ID).SetNillablePatronymic(fio.Patronymic)
+func (p *Postgres) UpdateUser(ctx context.Context, fio UpdateEnrichedFIO) (*ent.User, error) {
+	q := p.cl.User.UpdateOneID(fio.ID).SetNillablePatronymic(fio.Patronymic)
 
 	if fio.Gender != nil {
 		q.SetGender(*fio.Gender)
@@ -135,14 +136,14 @@ func (c *Postgres) UpdateUser(ctx context.Context, fio UpdateEnrichedFIO) (*ent.
 }
 
 // DeleteUser in the database by id.
-func (c *Postgres) DeleteUser(ctx context.Context, id int) (*ent.User, error) {
-	u, err := c.cl.User.Get(ctx, id)
+func (p *Postgres) DeleteUser(ctx context.Context, id int) (*ent.User, error) {
+	u, err := p.cl.User.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return u, c.cl.User.DeleteOne(u).Exec(ctx)
+	return u, p.cl.User.DeleteOne(u).Exec(ctx)
 }
 
-func (c *Postgres) Close() error {
-	return c.cl.Close()
+func (p *Postgres) Close() error {
+	return p.cl.Close()
 }
