@@ -6,7 +6,8 @@ package graph
 
 import (
 	"context"
-
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/wtkeqrf0/restService/api"
 )
 
@@ -18,19 +19,52 @@ func (r *mutationResolver) CreateFio(ctx context.Context, fios []*api.Fio) ([]*a
 
 // UpdateEnrichedFio is the resolver for the updateEnrichedFIO field.
 func (r *mutationResolver) UpdateEnrichedFio(ctx context.Context, enrichedFio api.EnrichedFio) (*api.User, error) {
-	user, err := r.UpdateEnrichedFIO(ctx, api.UpdateEnrichedFIORequest{EnrichedFio: enrichedFio})
+	req := api.UpdateEnrichedFIORequest{EnrichedFio: enrichedFio}
+
+	if err := req.Validate(); err != nil {
+		graphql.AddError(ctx, &gqlerror.Error{
+			Err:     err,
+			Message: err.Error(),
+			Path:    graphql.GetPath(ctx),
+		})
+		return nil, nil
+	}
+
+	user, err := r.UpdateEnrichedFIO(ctx, req)
 	return user.User, err
 }
 
 // DeleteEnrichedFio is the resolver for the deleteEnrichedFIO field.
 func (r *mutationResolver) DeleteEnrichedFio(ctx context.Context, id int) (*api.User, error) {
-	user, err := r.DeleteEnrichedFIO(ctx, api.DeleteEnrichedFIORequest{ID: id})
+	req := api.DeleteEnrichedFIORequest{ID: id}
+
+	if err := req.Validate(); err != nil {
+		graphql.AddError(ctx, &gqlerror.Error{
+			Err:     err,
+			Message: err.Error(),
+			Path:    graphql.GetPath(ctx),
+		})
+		return nil, nil
+	}
+
+	user, err := r.DeleteEnrichedFIO(ctx, req)
 	return user.User, err
 }
 
 // GetEnrichedFio is the resolver for the getEnrichedFIO field.
 func (r *queryResolver) GetEnrichedFio(ctx context.Context, filter api.Filter) ([]*api.User, error) {
-	users, err := r.GetEnrichedFIO(ctx, api.GetEnrichedFIORequest{Filter: filter})
+	req := api.GetEnrichedFIORequest{Filter: filter}
+
+	if err := req.Validate(); err != nil {
+		graphql.AddError(ctx, &gqlerror.Error{
+			Err:     err,
+			Message: err.Error(),
+			Path:    graphql.GetPath(ctx),
+		})
+		return nil, nil
+	}
+
+	users, err := r.GetEnrichedFIO(ctx, req)
 	return users.Users, err
 }
 
