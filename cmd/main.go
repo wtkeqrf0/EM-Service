@@ -110,7 +110,7 @@ func main() {
 		}
 	}()
 
-	log.Infof("connect to http://localhost:%d/ for GraphQL playground", cfg.Port)
+	log.Infof("server started on port %d", cfg.Port)
 
 	<-quit
 
