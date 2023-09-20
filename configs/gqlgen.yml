@@ -13,9 +13,9 @@ exec:
 #   package: graph
 
 # Where should any generated models go?
-model:
-  filename: ../api/types.go
-  package: api
+#model:
+#  filename: ../api/types.go
+#  package: api
 
 # Where should the resolver implementations go?
 resolver:
@@ -46,10 +46,10 @@ resolver:
 
 # Optional: turn off to make struct-type struct fields not use pointers
 # e.g. type Thing struct { FieldA OtherThing } instead of { FieldA *OtherThing }
-# struct_fields_always_pointers: true
+struct_fields_always_pointers: false
 
 # Optional: turn off to make resolvers return values instead of pointers for structs
-# resolvers_always_return_pointers: true
+resolvers_always_return_pointers: false
 
 # Optional: turn on to return pointers instead of values in unmarshalInput
 # return_pointers_in_unmarshalinput: false
@@ -66,7 +66,7 @@ resolver:
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "github.com/wtkeqrf0/restService/api"
+  - "github.com/wtkeqrf0/restService/api"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
