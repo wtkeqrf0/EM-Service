@@ -8,24 +8,6 @@ type User {
   country: String!
 }
 
-input Filter {
-  limit: Int!
-  offset: Int!
-  order: String
-  minAge: Int
-  maxAge: Int
-}
-
-type Query {
-  getEnrichedFIO(filter: Filter!): [User!]!
-}
-
-input Fio {
-  name: String!
-  surname: String!
-  patronymic: String
-}
-
 type FailedFio {
   name: String!
   surname: String!
@@ -42,8 +24,62 @@ input EnrichedFio {
   country: String
 }
 
+input Filter {
+  limit: Int!
+  offset: Int!
+  order: String
+  minAge: Int
+  maxAge: Int
+}
+
+input Fio {
+  name: String!
+  surname: String!
+  patronymic: String
+}
+
+# -------------------------------
+
+input CreateFioRequest {
+   FIOs: [Fio!]!
+}
+
+type CreateFioResponse {
+  failedFIOs: [FailedFio!]!
+}
+
+input UpdateEnrichedFioRequest {
+  enrichedFio: EnrichedFio!
+}
+
+type UpdateEnrichedFioResponse {
+  user: User
+}
+
+input DeleteEnrichedFioRequest {
+  id: Int!
+}
+
+type DeleteEnrichedFioResponse {
+  user: User
+}
+
 type Mutation {
-  createFIO(fios: [Fio!]!): [FailedFio!]!
-  updateEnrichedFIO(enrichedFIO: EnrichedFio!): User
-  deleteEnrichedFIO(id: Int!): User
+  createFio(req: CreateFioRequest!): CreateFioResponse!
+  updateEnrichedFio(req: UpdateEnrichedFioRequest!): UpdateEnrichedFioResponse!
+  deleteEnrichedFio(req: DeleteEnrichedFioRequest!): DeleteEnrichedFioResponse!
+}
+
+# ---------------------------
+
+input GetEnrichedFioRequest {
+  filter: Filter!
+}
+
+type GetEnrichedFioResponse {
+  users: [User!]!
+}
+
+type Query {
+  getEnrichedFio(req: GetEnrichedFioRequest!): GetEnrichedFioResponse!
 }
