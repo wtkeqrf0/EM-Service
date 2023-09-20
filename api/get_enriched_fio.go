@@ -30,21 +30,21 @@ func (r GetEnrichedFioRequest) Validate() error {
 // return value will be retrieved from the cache.
 func (s *Server) GetEnrichedFio(ctx context.Context, r GetEnrichedFioRequest) (GetEnrichedFioResponse, error) {
 
+	var resp GetEnrichedFioResponse
 	key, err := s.ctrl.CacheKey(r)
 	if err != nil {
-		return GetEnrichedFioResponse{}, newError(err, ErrorInternal)
+		return resp, newDBError(err)
 	}
 
-	var resp GetEnrichedFioResponse
 	if err = s.ctrl.Get(ctx, key, &resp); err != nil {
-		return GetEnrichedFioResponse{}, newError(err, ErrorInternal)
+		return resp, newDBError(err)
 	} else if resp.Users != nil {
 		return resp, nil
 	}
 
 	users, err := s.ctrl.Users(ctx, postgres.Filter(r.Filter))
 	if err != nil {
-		return GetEnrichedFioResponse{}, newError(err, ErrorInternal)
+		return resp, newDBError(err)
 	}
 
 	res := make([]*User, len(users))
@@ -63,7 +63,7 @@ func (s *Server) GetEnrichedFio(ctx context.Context, r GetEnrichedFioRequest) (G
 	resp.Users = res
 
 	if err = s.ctrl.Save(ctx, key, resp); err != nil {
-		return GetEnrichedFioResponse{}, newError(err, ErrorInternal)
+		return GetEnrichedFioResponse{}, newDBError(err)
 	}
 
 	return resp, nil

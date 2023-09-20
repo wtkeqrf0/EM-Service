@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/go-playground/validator/v10"
+	"github.com/wtkeqrf0/restService/pkg/ent"
 )
 
 // ErrorType contains types of possible API errors.
@@ -51,12 +52,27 @@ func newValidationError(errs validator.ValidationErrors) *ValidationError {
 	}
 }
 
-// AbstractError the structure describes the error at the API level.
-type AbstractError struct {
-	MyError `json:"-"`
-	Err     error `json:"error"`
+// DBError the structure describes the error at the API level.
+type DBError struct {
+	MyError     `json:"-"`
+	Description string `json:"description"`
 }
 
-func newError(err error, et ErrorType) AbstractError {
-	return AbstractError{Err: err, MyError: MyError{Type: et}}
+// TODO: create a middleware to bring all errors to this type
+func newDBError(err error) DBError {
+	if _, ok := err.(*ent.NotFoundError); ok {
+		return DBError{
+			Description: err.Error()[5:],
+			MyError: MyError{
+				Type: ErrorNotFound,
+			},
+		}
+	}
+
+	return DBError{
+		MyError: MyError{
+			Type: ErrorInternal,
+		},
+		Description: err.Error(),
+	}
 }

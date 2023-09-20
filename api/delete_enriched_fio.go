@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
-	"github.com/wtkeqrf0/restService/pkg/ent"
 )
 
 type DeleteEnrichedFioRequest struct {
@@ -29,10 +28,7 @@ func (r DeleteEnrichedFioRequest) Validate() error {
 func (s *Server) DeleteEnrichedFio(ctx context.Context, r DeleteEnrichedFioRequest) (DeleteEnrichedFioResponse, error) {
 	user, err := s.ctrl.DeleteUser(ctx, r.ID)
 	if err != nil {
-		if _, ok := err.(*ent.NotFoundError); ok {
-			return DeleteEnrichedFioResponse{}, newError(err, ErrorNotFound)
-		}
-		return DeleteEnrichedFioResponse{}, newError(err, ErrorInternal)
+		return DeleteEnrichedFioResponse{}, newDBError(err)
 	}
 
 	return DeleteEnrichedFioResponse{User: &User{

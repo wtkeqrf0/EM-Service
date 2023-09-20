@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/go-playground/validator/v10"
 	"github.com/wtkeqrf0/restService/internal/postgres"
-	"github.com/wtkeqrf0/restService/pkg/ent"
 )
 
 type UpdateEnrichedFioRequest struct {
@@ -30,10 +29,7 @@ func (r UpdateEnrichedFioRequest) Validate() error {
 func (s *Server) UpdateEnrichedFio(ctx context.Context, r UpdateEnrichedFioRequest) (UpdateEnrichedFioResponse, error) {
 	user, err := s.ctrl.UpdateUser(ctx, postgres.UpdateEnrichedFIO(r.EnrichedFio))
 	if err != nil {
-		if _, ok := err.(*ent.NotFoundError); ok {
-			return UpdateEnrichedFioResponse{}, newError(err, ErrorNotFound)
-		}
-		return UpdateEnrichedFioResponse{}, newError(err, ErrorInternal)
+		return UpdateEnrichedFioResponse{}, newDBError(err)
 	}
 
 	return UpdateEnrichedFioResponse{User: &User{
