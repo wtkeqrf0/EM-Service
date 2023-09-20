@@ -45,20 +45,36 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	CreateFioResponse struct {
+		FailedFIOs func(childComplexity int) int
+	}
+
+	DeleteEnrichedFioResponse struct {
+		User func(childComplexity int) int
+	}
+
 	FailedFio struct {
 		Name       func(childComplexity int) int
 		Patronymic func(childComplexity int) int
 		Surname    func(childComplexity int) int
 	}
 
+	GetEnrichedFioResponse struct {
+		Users func(childComplexity int) int
+	}
+
 	Mutation struct {
-		CreateFio         func(childComplexity int, fios []*api.Fio) int
-		DeleteEnrichedFio func(childComplexity int, id int) int
-		UpdateEnrichedFio func(childComplexity int, enrichedFio api.EnrichedFio) int
+		CreateFio         func(childComplexity int, req api.CreateFioRequest) int
+		DeleteEnrichedFio func(childComplexity int, req api.DeleteEnrichedFioRequest) int
+		UpdateEnrichedFio func(childComplexity int, req api.UpdateEnrichedFioRequest) int
 	}
 
 	Query struct {
-		GetEnrichedFio func(childComplexity int, filter api.Filter) int
+		GetEnrichedFio func(childComplexity int, req api.GetEnrichedFioRequest) int
+	}
+
+	UpdateEnrichedFioResponse struct {
+		User func(childComplexity int) int
 	}
 
 	User struct {
@@ -73,12 +89,12 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateFio(ctx context.Context, fios []*api.Fio) ([]*api.FailedFio, error)
-	UpdateEnrichedFio(ctx context.Context, enrichedFio api.EnrichedFio) (*api.User, error)
-	DeleteEnrichedFio(ctx context.Context, id int) (*api.User, error)
+	CreateFio(ctx context.Context, req api.CreateFioRequest) (api.CreateFioResponse, error)
+	UpdateEnrichedFio(ctx context.Context, req api.UpdateEnrichedFioRequest) (api.UpdateEnrichedFioResponse, error)
+	DeleteEnrichedFio(ctx context.Context, req api.DeleteEnrichedFioRequest) (api.DeleteEnrichedFioResponse, error)
 }
 type QueryResolver interface {
-	GetEnrichedFio(ctx context.Context, filter api.Filter) ([]*api.User, error)
+	GetEnrichedFio(ctx context.Context, req api.GetEnrichedFioRequest) (api.GetEnrichedFioResponse, error)
 }
 
 type executableSchema struct {
@@ -95,6 +111,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "CreateFioResponse.failedFIOs":
+		if e.complexity.CreateFioResponse.FailedFIOs == nil {
+			break
+		}
+
+		return e.complexity.CreateFioResponse.FailedFIOs(childComplexity), true
+
+	case "DeleteEnrichedFioResponse.user":
+		if e.complexity.DeleteEnrichedFioResponse.User == nil {
+			break
+		}
+
+		return e.complexity.DeleteEnrichedFioResponse.User(childComplexity), true
 
 	case "FailedFio.name":
 		if e.complexity.FailedFio.Name == nil {
@@ -117,53 +147,67 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FailedFio.Surname(childComplexity), true
 
-	case "Mutation.createFIO":
+	case "GetEnrichedFioResponse.users":
+		if e.complexity.GetEnrichedFioResponse.Users == nil {
+			break
+		}
+
+		return e.complexity.GetEnrichedFioResponse.Users(childComplexity), true
+
+	case "Mutation.createFio":
 		if e.complexity.Mutation.CreateFio == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createFIO_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createFio_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateFio(childComplexity, args["fios"].([]*api.Fio)), true
+		return e.complexity.Mutation.CreateFio(childComplexity, args["req"].(api.CreateFioRequest)), true
 
-	case "Mutation.deleteEnrichedFIO":
+	case "Mutation.deleteEnrichedFio":
 		if e.complexity.Mutation.DeleteEnrichedFio == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteEnrichedFIO_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteEnrichedFio_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteEnrichedFio(childComplexity, args["id"].(int)), true
+		return e.complexity.Mutation.DeleteEnrichedFio(childComplexity, args["req"].(api.DeleteEnrichedFioRequest)), true
 
-	case "Mutation.updateEnrichedFIO":
+	case "Mutation.updateEnrichedFio":
 		if e.complexity.Mutation.UpdateEnrichedFio == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateEnrichedFIO_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateEnrichedFio_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateEnrichedFio(childComplexity, args["enrichedFIO"].(api.EnrichedFio)), true
+		return e.complexity.Mutation.UpdateEnrichedFio(childComplexity, args["req"].(api.UpdateEnrichedFioRequest)), true
 
-	case "Query.getEnrichedFIO":
+	case "Query.getEnrichedFio":
 		if e.complexity.Query.GetEnrichedFio == nil {
 			break
 		}
 
-		args, err := ec.field_Query_getEnrichedFIO_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_getEnrichedFio_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.GetEnrichedFio(childComplexity, args["filter"].(api.Filter)), true
+		return e.complexity.Query.GetEnrichedFio(childComplexity, args["req"].(api.GetEnrichedFioRequest)), true
+
+	case "UpdateEnrichedFioResponse.user":
+		if e.complexity.UpdateEnrichedFioResponse.User == nil {
+			break
+		}
+
+		return e.complexity.UpdateEnrichedFioResponse.User(childComplexity), true
 
 	case "User.age":
 		if e.complexity.User.Age == nil {
@@ -222,9 +266,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputCreateFioRequest,
+		ec.unmarshalInputDeleteEnrichedFioRequest,
 		ec.unmarshalInputEnrichedFio,
 		ec.unmarshalInputFilter,
 		ec.unmarshalInputFio,
+		ec.unmarshalInputGetEnrichedFioRequest,
+		ec.unmarshalInputUpdateEnrichedFioRequest,
 	)
 	first := true
 
@@ -341,48 +389,48 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createFIO_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createFio_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []*api.Fio
-	if tmp, ok := rawArgs["fios"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fios"))
-		arg0, err = ec.unmarshalNFio2ᚕᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐFioᚄ(ctx, tmp)
+	var arg0 api.CreateFioRequest
+	if tmp, ok := rawArgs["req"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("req"))
+		arg0, err = ec.unmarshalNCreateFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐCreateFioRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["fios"] = arg0
+	args["req"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteEnrichedFIO_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteEnrichedFio_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+	var arg0 api.DeleteEnrichedFioRequest
+	if tmp, ok := rawArgs["req"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("req"))
+		arg0, err = ec.unmarshalNDeleteEnrichedFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐDeleteEnrichedFioRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
+	args["req"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateEnrichedFIO_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateEnrichedFio_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 api.EnrichedFio
-	if tmp, ok := rawArgs["enrichedFIO"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enrichedFIO"))
-		arg0, err = ec.unmarshalNEnrichedFio2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐEnrichedFio(ctx, tmp)
+	var arg0 api.UpdateEnrichedFioRequest
+	if tmp, ok := rawArgs["req"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("req"))
+		arg0, err = ec.unmarshalNUpdateEnrichedFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUpdateEnrichedFioRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["enrichedFIO"] = arg0
+	args["req"] = arg0
 	return args, nil
 }
 
@@ -401,18 +449,18 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getEnrichedFIO_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getEnrichedFio_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 api.Filter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNFilter2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐFilter(ctx, tmp)
+	var arg0 api.GetEnrichedFioRequest
+	if tmp, ok := rawArgs["req"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("req"))
+		arg0, err = ec.unmarshalNGetEnrichedFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐGetEnrichedFioRequest(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filter"] = arg0
+	args["req"] = arg0
 	return args, nil
 }
 
@@ -453,6 +501,115 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _CreateFioResponse_failedFIOs(ctx context.Context, field graphql.CollectedField, obj *api.CreateFioResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateFioResponse_failedFIOs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FailedFIOs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*api.FailedFio)
+	fc.Result = res
+	return ec.marshalNFailedFio2ᚕᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐFailedFioᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateFioResponse_failedFIOs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateFioResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_FailedFio_name(ctx, field)
+			case "surname":
+				return ec.fieldContext_FailedFio_surname(ctx, field)
+			case "patronymic":
+				return ec.fieldContext_FailedFio_patronymic(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FailedFio", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteEnrichedFioResponse_user(ctx context.Context, field graphql.CollectedField, obj *api.DeleteEnrichedFioResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteEnrichedFioResponse_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*api.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteEnrichedFioResponse_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteEnrichedFioResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "surname":
+				return ec.fieldContext_User_surname(ctx, field)
+			case "patronymic":
+				return ec.fieldContext_User_patronymic(ctx, field)
+			case "age":
+				return ec.fieldContext_User_age(ctx, field)
+			case "gender":
+				return ec.fieldContext_User_gender(ctx, field)
+			case "country":
+				return ec.fieldContext_User_country(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _FailedFio_name(ctx context.Context, field graphql.CollectedField, obj *api.FailedFio) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_FailedFio_name(ctx, field)
@@ -583,8 +740,8 @@ func (ec *executionContext) fieldContext_FailedFio_patronymic(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createFIO(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createFIO(ctx, field)
+func (ec *executionContext) _GetEnrichedFioResponse_users(ctx context.Context, field graphql.CollectedField, obj *api.GetEnrichedFioResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetEnrichedFioResponse_users(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -597,206 +754,7 @@ func (ec *executionContext) _Mutation_createFIO(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateFio(rctx, fc.Args["fios"].([]*api.Fio))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*api.FailedFio)
-	fc.Result = res
-	return ec.marshalNFailedFio2ᚕᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐFailedFioᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createFIO(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "name":
-				return ec.fieldContext_FailedFio_name(ctx, field)
-			case "surname":
-				return ec.fieldContext_FailedFio_surname(ctx, field)
-			case "patronymic":
-				return ec.fieldContext_FailedFio_patronymic(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type FailedFio", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createFIO_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateEnrichedFIO(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateEnrichedFIO(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateEnrichedFio(rctx, fc.Args["enrichedFIO"].(api.EnrichedFio))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*api.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateEnrichedFIO(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "surname":
-				return ec.fieldContext_User_surname(ctx, field)
-			case "patronymic":
-				return ec.fieldContext_User_patronymic(ctx, field)
-			case "age":
-				return ec.fieldContext_User_age(ctx, field)
-			case "gender":
-				return ec.fieldContext_User_gender(ctx, field)
-			case "country":
-				return ec.fieldContext_User_country(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateEnrichedFIO_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteEnrichedFIO(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteEnrichedFIO(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteEnrichedFio(rctx, fc.Args["id"].(int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*api.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteEnrichedFIO(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "surname":
-				return ec.fieldContext_User_surname(ctx, field)
-			case "patronymic":
-				return ec.fieldContext_User_patronymic(ctx, field)
-			case "age":
-				return ec.fieldContext_User_age(ctx, field)
-			case "gender":
-				return ec.fieldContext_User_gender(ctx, field)
-			case "country":
-				return ec.fieldContext_User_country(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteEnrichedFIO_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_getEnrichedFIO(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getEnrichedFIO(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetEnrichedFio(rctx, fc.Args["filter"].(api.Filter))
+		return obj.Users, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -813,12 +771,12 @@ func (ec *executionContext) _Query_getEnrichedFIO(ctx context.Context, field gra
 	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUserᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_getEnrichedFIO(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_GetEnrichedFioResponse_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Query",
+		Object:     "GetEnrichedFioResponse",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -839,6 +797,54 @@ func (ec *executionContext) fieldContext_Query_getEnrichedFIO(ctx context.Contex
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createFio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createFio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateFio(rctx, fc.Args["req"].(api.CreateFioRequest))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(api.CreateFioResponse)
+	fc.Result = res
+	return ec.marshalNCreateFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐCreateFioResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createFio(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "failedFIOs":
+				return ec.fieldContext_CreateFioResponse_failedFIOs(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateFioResponse", field.Name)
+		},
+	}
 	defer func() {
 		if r := recover(); r != nil {
 			err = ec.Recover(ctx, r)
@@ -846,7 +852,184 @@ func (ec *executionContext) fieldContext_Query_getEnrichedFIO(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getEnrichedFIO_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createFio_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateEnrichedFio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateEnrichedFio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEnrichedFio(rctx, fc.Args["req"].(api.UpdateEnrichedFioRequest))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(api.UpdateEnrichedFioResponse)
+	fc.Result = res
+	return ec.marshalNUpdateEnrichedFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUpdateEnrichedFioResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateEnrichedFio(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_UpdateEnrichedFioResponse_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateEnrichedFioResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateEnrichedFio_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteEnrichedFio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteEnrichedFio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteEnrichedFio(rctx, fc.Args["req"].(api.DeleteEnrichedFioRequest))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(api.DeleteEnrichedFioResponse)
+	fc.Result = res
+	return ec.marshalNDeleteEnrichedFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐDeleteEnrichedFioResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteEnrichedFio(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_DeleteEnrichedFioResponse_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteEnrichedFioResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteEnrichedFio_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getEnrichedFio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getEnrichedFio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetEnrichedFio(rctx, fc.Args["req"].(api.GetEnrichedFioRequest))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(api.GetEnrichedFioResponse)
+	fc.Result = res
+	return ec.marshalNGetEnrichedFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐGetEnrichedFioResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getEnrichedFio(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "users":
+				return ec.fieldContext_GetEnrichedFioResponse_users(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetEnrichedFioResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getEnrichedFio_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -977,6 +1160,63 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateEnrichedFioResponse_user(ctx context.Context, field graphql.CollectedField, obj *api.UpdateEnrichedFioResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateEnrichedFioResponse_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*api.User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateEnrichedFioResponse_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateEnrichedFioResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "surname":
+				return ec.fieldContext_User_surname(ctx, field)
+			case "patronymic":
+				return ec.fieldContext_User_patronymic(ctx, field)
+			case "age":
+				return ec.fieldContext_User_age(ctx, field)
+			case "gender":
+				return ec.fieldContext_User_gender(ctx, field)
+			case "country":
+				return ec.fieldContext_User_country(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -3060,6 +3300,64 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateFioRequest(ctx context.Context, obj interface{}) (api.CreateFioRequest, error) {
+	var it api.CreateFioRequest
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"FIOs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "FIOs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FIOs"))
+			data, err := ec.unmarshalNFio2ᚕᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐFioᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FIOs = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteEnrichedFioRequest(ctx context.Context, obj interface{}) (api.DeleteEnrichedFioRequest, error) {
+	var it api.DeleteEnrichedFioRequest
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEnrichedFio(ctx context.Context, obj interface{}) (api.EnrichedFio, error) {
 	var it api.EnrichedFio
 	asMap := map[string]interface{}{}
@@ -3255,6 +3553,64 @@ func (ec *executionContext) unmarshalInputFio(ctx context.Context, obj interface
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetEnrichedFioRequest(ctx context.Context, obj interface{}) (api.GetEnrichedFioRequest, error) {
+	var it api.GetEnrichedFioRequest
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"filter"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "filter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			data, err := ec.unmarshalNFilter2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Filter = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateEnrichedFioRequest(ctx context.Context, obj interface{}) (api.UpdateEnrichedFioRequest, error) {
+	var it api.UpdateEnrichedFioRequest
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"enrichedFio"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "enrichedFio":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enrichedFio"))
+			data, err := ec.unmarshalNEnrichedFio2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐEnrichedFio(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EnrichedFio = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3262,6 +3618,81 @@ func (ec *executionContext) unmarshalInputFio(ctx context.Context, obj interface
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var createFioResponseImplementors = []string{"CreateFioResponse"}
+
+func (ec *executionContext) _CreateFioResponse(ctx context.Context, sel ast.SelectionSet, obj *api.CreateFioResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createFioResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateFioResponse")
+		case "failedFIOs":
+			out.Values[i] = ec._CreateFioResponse_failedFIOs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteEnrichedFioResponseImplementors = []string{"DeleteEnrichedFioResponse"}
+
+func (ec *executionContext) _DeleteEnrichedFioResponse(ctx context.Context, sel ast.SelectionSet, obj *api.DeleteEnrichedFioResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteEnrichedFioResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteEnrichedFioResponse")
+		case "user":
+			out.Values[i] = ec._DeleteEnrichedFioResponse_user(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var failedFioImplementors = []string{"FailedFio"}
 
@@ -3309,6 +3740,45 @@ func (ec *executionContext) _FailedFio(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var getEnrichedFioResponseImplementors = []string{"GetEnrichedFioResponse"}
+
+func (ec *executionContext) _GetEnrichedFioResponse(ctx context.Context, sel ast.SelectionSet, obj *api.GetEnrichedFioResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getEnrichedFioResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetEnrichedFioResponse")
+		case "users":
+			out.Values[i] = ec._GetEnrichedFioResponse_users(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3328,21 +3798,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createFIO":
+		case "createFio":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createFIO(ctx, field)
+				return ec._Mutation_createFio(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateEnrichedFIO":
+		case "updateEnrichedFio":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateEnrichedFIO(ctx, field)
+				return ec._Mutation_updateEnrichedFio(ctx, field)
 			})
-		case "deleteEnrichedFIO":
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteEnrichedFio":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteEnrichedFIO(ctx, field)
+				return ec._Mutation_deleteEnrichedFio(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3385,7 +3861,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "getEnrichedFIO":
+		case "getEnrichedFio":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3394,7 +3870,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getEnrichedFIO(ctx, field)
+				res = ec._Query_getEnrichedFio(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3415,6 +3891,42 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateEnrichedFioResponseImplementors = []string{"UpdateEnrichedFioResponse"}
+
+func (ec *executionContext) _UpdateEnrichedFioResponse(ctx context.Context, sel ast.SelectionSet, obj *api.UpdateEnrichedFioResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateEnrichedFioResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEnrichedFioResponse")
+		case "user":
+			out.Values[i] = ec._UpdateEnrichedFioResponse_user(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3845,6 +4357,24 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐCreateFioRequest(ctx context.Context, v interface{}) (api.CreateFioRequest, error) {
+	res, err := ec.unmarshalInputCreateFioRequest(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐCreateFioResponse(ctx context.Context, sel ast.SelectionSet, v api.CreateFioResponse) graphql.Marshaler {
+	return ec._CreateFioResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalNDeleteEnrichedFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐDeleteEnrichedFioRequest(ctx context.Context, v interface{}) (api.DeleteEnrichedFioRequest, error) {
+	res, err := ec.unmarshalInputDeleteEnrichedFioRequest(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteEnrichedFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐDeleteEnrichedFioResponse(ctx context.Context, sel ast.SelectionSet, v api.DeleteEnrichedFioResponse) graphql.Marshaler {
+	return ec._DeleteEnrichedFioResponse(ctx, sel, &v)
+}
+
 func (ec *executionContext) unmarshalNEnrichedFio2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐEnrichedFio(ctx context.Context, v interface{}) (api.EnrichedFio, error) {
 	res, err := ec.unmarshalInputEnrichedFio(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3931,6 +4461,15 @@ func (ec *executionContext) unmarshalNFio2ᚖgithubᚗcomᚋwtkeqrf0ᚋrestServi
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNGetEnrichedFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐGetEnrichedFioRequest(ctx context.Context, v interface{}) (api.GetEnrichedFioRequest, error) {
+	res, err := ec.unmarshalInputGetEnrichedFioRequest(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetEnrichedFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐGetEnrichedFioResponse(ctx context.Context, sel ast.SelectionSet, v api.GetEnrichedFioResponse) graphql.Marshaler {
+	return ec._GetEnrichedFioResponse(ctx, sel, &v)
+}
+
 func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalIntID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3974,6 +4513,15 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateEnrichedFioRequest2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUpdateEnrichedFioRequest(ctx context.Context, v interface{}) (api.UpdateEnrichedFioRequest, error) {
+	res, err := ec.unmarshalInputUpdateEnrichedFioRequest(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateEnrichedFioResponse2githubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUpdateEnrichedFioResponse(ctx context.Context, sel ast.SelectionSet, v api.UpdateEnrichedFioResponse) graphql.Marshaler {
+	return ec._UpdateEnrichedFioResponse(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋwtkeqrf0ᚋrestServiceᚋapiᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.User) graphql.Marshaler {
