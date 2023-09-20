@@ -56,6 +56,18 @@ func main() {
 
 	srv := api.NewServer(ctrl)
 
+	graphSrv := handler.NewDefaultServer(
+		graph.NewExecutableSchema(
+			graph.Config{
+				Resolvers: &graph.Resolver{
+					Server: srv,
+				},
+			},
+		),
+	)
+
+	graphSrv.AroundFields(graph.Validator)
+
 	//-------------------------Setup handlers-------------------------
 
 	r := chi.NewRouter()
@@ -63,24 +75,15 @@ func main() {
 
 	// REST handlers
 	r.Route("/fio", func(r chi.Router) {
-		r.Post("/", rest.API[api.CreateFIORequest, api.CreateFIOResponse](srv.CreateFIO).HandlerFunc())
-		r.Patch("/", rest.API[api.UpdateEnrichedFIORequest, api.UpdateEnrichedFIOResponse](srv.UpdateEnrichedFIO).HandlerFunc())
-		r.Get("/", rest.API[api.GetEnrichedFIORequest, api.GetEnrichedFIOResponse](srv.GetEnrichedFIO).HandlerFunc())
-		r.Delete("/", rest.API[api.DeleteEnrichedFIORequest, api.DeleteEnrichedFIOResponse](srv.DeleteEnrichedFIO).HandlerFunc())
+		r.Post("/", rest.API[api.CreateFioRequest, api.CreateFioResponse](srv.CreateFio).HandlerFunc())
+		r.Patch("/", rest.API[api.UpdateEnrichedFioRequest, api.UpdateEnrichedFioResponse](srv.UpdateEnrichedFio).HandlerFunc())
+		r.Get("/", rest.API[api.GetEnrichedFioRequest, api.GetEnrichedFioResponse](srv.GetEnrichedFio).HandlerFunc())
+		r.Delete("/", rest.API[api.DeleteEnrichedFioRequest, api.DeleteEnrichedFioResponse](srv.DeleteEnrichedFio).HandlerFunc())
 	})
 
 	// GraphQL handler
 	r.Route("/query", func(r chi.Router) {
-		r.Handle("/", handler.NewDefaultServer(
-			graph.NewExecutableSchema(
-				graph.Config{
-					Resolvers: &graph.Resolver{
-						Server: srv,
-					},
-				},
-			),
-		),
-		)
+		r.Handle("/", graphSrv)
 	})
 
 	//-------------------Create and start http httpServer-------------------
