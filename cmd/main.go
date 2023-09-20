@@ -67,6 +67,7 @@ func main() {
 	)
 
 	graphSrv.AroundFields(graph.Validator)
+	graphSrv.SetErrorPresenter(graph.ErrorPresenter)
 
 	//-------------------------Setup handlers-------------------------
 

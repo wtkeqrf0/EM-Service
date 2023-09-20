@@ -18,17 +18,24 @@ type Resolver struct {
 func Validator(ctx context.Context, next graphql.Resolver) (any, error) {
 	if v, ok := graphql.GetFieldContext(ctx).Args["req"].(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			graphql.AddError(ctx, &gqlerror.Error{
-				Message: "Request is not valid",
-				Path:    graphql.GetPath(ctx),
-				Extensions: map[string]interface{}{
-					"code":  err.Error(),
-					"error": err,
-				},
-			})
-			return nil, nil
+			return nil, err
 		}
 	}
 
 	return next(ctx)
+}
+
+func ErrorPresenter(ctx context.Context, err error) *gqlerror.Error {
+	err = err.(*gqlerror.Error).Err
+
+	return &gqlerror.Error{
+		Err:     err,
+		Message: "Failed to process request",
+		Path:    graphql.GetPath(ctx),
+		Extensions: map[string]interface{}{
+			"code":  err.Error(),
+			"error": err,
+		},
+		Rule: "",
+	}
 }
