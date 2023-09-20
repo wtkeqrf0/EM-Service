@@ -7,15 +7,15 @@ import (
 	"github.com/wtkeqrf0/restService/pkg/ent"
 )
 
-type UpdateEnrichedFIORequest struct {
+type UpdateEnrichedFioRequest struct {
 	EnrichedFio
 }
 
-type UpdateEnrichedFIOResponse struct {
-	User *User
+type UpdateEnrichedFioResponse struct {
+	User *User `json:"user,omitempty"`
 }
 
-func (r UpdateEnrichedFIORequest) Validate() error {
+func (r UpdateEnrichedFioRequest) Validate() error {
 	err := vr.Struct(r)
 	if err == nil {
 		return nil
@@ -25,18 +25,18 @@ func (r UpdateEnrichedFIORequest) Validate() error {
 	return newValidationError(errs)
 }
 
-// UpdateEnrichedFIO updates FIO by ID from database.
+// UpdateEnrichedFio updates FIO by ID from database.
 // Returns an updated FIO.
-func (s *Server) UpdateEnrichedFIO(ctx context.Context, r UpdateEnrichedFIORequest) (UpdateEnrichedFIOResponse, error) {
+func (s *Server) UpdateEnrichedFio(ctx context.Context, r UpdateEnrichedFioRequest) (UpdateEnrichedFioResponse, error) {
 	user, err := s.ctrl.UpdateUser(ctx, postgres.UpdateEnrichedFIO(r.EnrichedFio))
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
-			return UpdateEnrichedFIOResponse{}, newError(err, ErrorNotFound)
+			return UpdateEnrichedFioResponse{}, newError(err, ErrorNotFound)
 		}
-		return UpdateEnrichedFIOResponse{}, newError(err, ErrorInternal)
+		return UpdateEnrichedFioResponse{}, newError(err, ErrorInternal)
 	}
 
-	return UpdateEnrichedFIOResponse{User: &User{
+	return UpdateEnrichedFioResponse{User: &User{
 		ID:         user.ID,
 		Name:       user.Name,
 		Surname:    user.Surname,

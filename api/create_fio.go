@@ -7,17 +7,17 @@ import (
 	"sync"
 )
 
-type CreateFIORequest struct {
+type CreateFioRequest struct {
 	FIOs []*Fio `json:"fios"`
 }
 
-type CreateFIOResponse struct {
+type CreateFioResponse struct {
 	FailedFIOs []*FailedFio `json:"failed_fios"`
 }
 
-// CreateFIO validates and produces a bulk of given FIOs.
+// CreateFio validates and produces a bulk of given FIOs.
 // Returns a slice of FIOs, which have not passed validation.
-func (s *Server) CreateFIO(ctx context.Context, r CreateFIORequest) (CreateFIOResponse, error) {
+func (s *Server) CreateFio(ctx context.Context, r CreateFioRequest) (CreateFioResponse, error) {
 	var gw sync.WaitGroup
 	var m sync.Mutex
 	var res []*FailedFio
@@ -40,5 +40,5 @@ func (s *Server) CreateFIO(ctx context.Context, r CreateFIORequest) (CreateFIORe
 	}
 	gw.Add(len(r.FIOs))
 	gw.Wait()
-	return CreateFIOResponse{FailedFIOs: res}, nil
+	return CreateFioResponse{FailedFIOs: res}, nil
 }
